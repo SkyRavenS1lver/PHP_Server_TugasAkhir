@@ -1,0 +1,276 @@
+{
+  "cluster_id": 4,
+  "food_count": 30,
+  "foods": [
+    {
+      "food_id": 22,
+      "recommendation_score": 0.3,
+      "popularity_score": 1.0,
+      "avg_energy": 253.02857142857144,
+      "avg_protein": 4.217142857142857,
+      "avg_carb": 55.947428571428574,
+      "avg_fat": 0.4217142857142857
+    },
+    {
+      "food_id": 107,
+      "recommendation_score": 0.052591463414634144,
+      "popularity_score": 0.17530487804878048,
+      "avg_energy": 336.29999999999995,
+      "avg_protein": 15.635,
+      "avg_carb": 48.3799985,
+      "avg_fat": 8.85
+    },
+    {
+      "food_id": 1154,
+      "recommendation_score": 0.04032012195121951,
+      "popularity_score": 0.13440040650406504,
+      "avg_energy": 444.36,
+      "avg_protein": 16.66350025,
+      "avg_carb": 55.703697749999996,
+      "avg_fat": 16.4783495
+    },
+    {
+      "food_id": 1039,
+      "recommendation_score": 0.036204268292682924,
+      "popularity_score": 0.12068089430894309,
+      "avg_energy": 115.9,
+      "avg_protein": 6.08,
+      "avg_carb": 8.17,
+      "avg_fat": 6.65
+    },
+    {
+      "food_id": 1144,
+      "recommendation_score": 0.03246951219512195,
+      "popularity_score": 0.10823170731707317,
+      "avg_energy": 440.2,
+      "avg_protein": 59.403200000000005,
+      "avg_carb": 77.85866666666666,
+      "avg_fat": 26.704400000000003
+    },
+    {
+      "food_id": 1304,
+      "recommendation_score": 0.03201219512195122,
+      "popularity_score": 0.10670731707317073,
+      "avg_energy": 336.0,
+      "avg_protein": 4.2,
+      "avg_carb": 37.8,
+      "avg_fat": 12.6
+    },
+    {
+      "food_id": 1306,
+      "recommendation_score": 0.029573170731707316,
+      "popularity_score": 0.09857723577235772,
+      "avg_energy": 131.22,
+      "avg_protein": 9.643999999999998,
+      "avg_carb": 7.43575,
+      "avg_fat": 6.89325
+    },
+    {
+      "food_id": 667,
+      "recommendation_score": 0.02160823170731707,
+      "popularity_score": 0.07202743902439024,
+      "avg_energy": 130.410005,
+      "avg_protein": 1.134000015,
+      "avg_carb": 33.7365,
+      "avg_fat": 0.56700001
+    },
+    {
+      "food_id": 795,
+      "recommendation_score": 0.02141768292682927,
+      "popularity_score": 0.07139227642276423,
+      "avg_energy": 418.69,
+      "avg_protein": 48.051,
+      "avg_carb": 0.1405,
+      "avg_fat": 23.60399975
+    },
+    {
+      "food_id": 1357,
+      "recommendation_score": 0.020579268292682928,
+      "popularity_score": 0.06859756097560976,
+      "avg_energy": 623.7,
+      "avg_protein": 12.6899985,
+      "avg_carb": 77.192997,
+      "avg_fat": 30.537
+    },
+    {
+      "food_id": 1152,
+      "recommendation_score": 0.020579268292682928,
+      "popularity_score": 0.06859756097560976,
+      "avg_energy": 73.44,
+      "avg_protein": 3.0024,
+      "avg_carb": 6.631199699999999,
+      "avg_fat": 4.26599998
+    },
+    {
+      "food_id": 578,
+      "recommendation_score": 0.01920731707317073,
+      "popularity_score": 0.06402439024390244,
+      "avg_energy": 81.52849599999999,
+      "avg_protein": 4.87490002,
+      "avg_carb": 3.53009972,
+      "avg_fat": 5.2951500199999995
+    },
+    {
+      "food_id": 1178,
+      "recommendation_score": 0.018940548780487804,
+      "popularity_score": 0.06313516260162602,
+      "avg_energy": 223.65,
+      "avg_protein": 3.7275,
+      "avg_carb": 49.451499999999996,
+      "avg_fat": 0.37274999999999997
+    },
+    {
+      "food_id": 1186,
+      "recommendation_score": 0.01638719512195122,
+      "popularity_score": 0.0546239837398374,
+      "avg_energy": 98.9,
+      "avg_protein": 0.8600000000000001,
+      "avg_carb": 25.585,
+      "avg_fat": 0.43000000000000005
+    },
+    {
+      "food_id": 106,
+      "recommendation_score": 0.01638719512195122,
+      "popularity_score": 0.0546239837398374,
+      "avg_energy": 188.7,
+      "avg_protein": 11.469999999999999,
+      "avg_carb": 19.4249995,
+      "avg_fat": 7.21500075
+    },
+    {
+      "food_id": 796,
+      "recommendation_score": 0.015701219512195122,
+      "popularity_score": 0.05233739837398374,
+      "avg_energy": 279.9225,
+      "avg_protein": 31.417873750000002,
+      "avg_carb": 1.076625,
+      "avg_fat": 15.757875250000001
+    },
+    {
+      "food_id": 81,
+      "recommendation_score": 0.01524390243902439,
+      "popularity_score": 0.0508130081300813,
+      "avg_energy": 306.0,
+      "avg_protein": 15.8,
+      "avg_carb": 26.0,
+      "avg_fat": 15.4
+    },
+    {
+      "food_id": 1276,
+      "recommendation_score": 0.01524390243902439,
+      "popularity_score": 0.0508130081300813,
+      "avg_energy": 477.0,
+      "avg_protein": 0.0,
+      "avg_carb": 118.8,
+      "avg_fat": 0.0
+    },
+    {
+      "food_id": 1326,
+      "recommendation_score": 0.01524390243902439,
+      "popularity_score": 0.0508130081300813,
+      "avg_energy": 190.0,
+      "avg_protein": 3.78,
+      "avg_carb": 41.72,
+      "avg_fat": 0.34
+    },
+    {
+      "food_id": 1338,
+      "recommendation_score": 0.01524390243902439,
+      "popularity_score": 0.0508130081300813,
+      "avg_energy": 152.0,
+      "avg_protein": 0.04,
+      "avg_carb": 39.6,
+      "avg_fat": 0.0
+    },
+    {
+      "food_id": 1296,
+      "recommendation_score": 0.01524390243902439,
+      "popularity_score": 0.0508130081300813,
+      "avg_energy": 528.0,
+      "avg_protein": 28.56,
+      "avg_carb": 43.6,
+      "avg_fat": 29.64
+    },
+    {
+      "food_id": 1209,
+      "recommendation_score": 0.01486280487804878,
+      "popularity_score": 0.04954268292682927,
+      "avg_energy": 514.8,
+      "avg_protein": 29.445002,
+      "avg_carb": 14.078999,
+      "avg_fat": 37.908
+    },
+    {
+      "food_id": 1229,
+      "recommendation_score": 0.014786585365853658,
+      "popularity_score": 0.04928861788617886,
+      "avg_energy": 271.60000333333335,
+      "avg_protein": 9.053333433333334,
+      "avg_carb": 33.626668333333335,
+      "avg_fat": 11.640000333333333
+    },
+    {
+      "food_id": 1017,
+      "recommendation_score": 0.014672256097560975,
+      "popularity_score": 0.04890752032520325,
+      "avg_energy": 84.7,
+      "avg_protein": 6.82,
+      "avg_carb": 0.38500000000000006,
+      "avg_fat": 5.94
+    },
+    {
+      "food_id": 1040,
+      "recommendation_score": 0.013528963414634146,
+      "popularity_score": 0.045096544715447155,
+      "avg_energy": 213.5,
+      "avg_protein": 4.066666666666666,
+      "avg_carb": 20.943333333333335,
+      "avg_fat": 12.708333333333334
+    },
+    {
+      "food_id": 1219,
+      "recommendation_score": 0.013338414634146341,
+      "popularity_score": 0.04446138211382114,
+      "avg_energy": 262.5,
+      "avg_protein": 8.75,
+      "avg_carb": 40.25,
+      "avg_fat": 8.75
+    },
+    {
+      "food_id": 1225,
+      "recommendation_score": 0.012195121951219511,
+      "popularity_score": 0.04065040650406504,
+      "avg_energy": 280.0,
+      "avg_protein": 13.52,
+      "avg_carb": 28.432001,
+      "avg_fat": 12.096
+    },
+    {
+      "food_id": 1218,
+      "recommendation_score": 0.012042682926829269,
+      "popularity_score": 0.04014227642276423,
+      "avg_energy": 96.696,
+      "avg_protein": 6.71184006,
+      "avg_carb": 0.436080004,
+      "avg_fat": 7.59664008
+    },
+    {
+      "food_id": 806,
+      "recommendation_score": 0.011509146341463413,
+      "popularity_score": 0.03836382113821138,
+      "avg_energy": 389.58000000000004,
+      "avg_protein": 16.006,
+      "avg_carb": 49.075,
+      "avg_fat": 14.344999999999999
+    },
+    {
+      "food_id": 1248,
+      "recommendation_score": 0.011432926829268292,
+      "popularity_score": 0.038109756097560975,
+      "avg_energy": 85.5,
+      "avg_protein": 0.675,
+      "avg_carb": 17.550001,
+      "avg_fat": 1.35
+    }
+  ]
+}

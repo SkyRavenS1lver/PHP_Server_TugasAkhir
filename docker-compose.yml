@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: fatfree-php
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+      - redis
+      - flask
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=myapp
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres123
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: fatfree-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - web
+    networks:
+      - app-network
+
+  flask:
+    build: 
+      context: ./ml_services
+    container_name: ml-service-flask
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    volumes:
+      - ./ml_services:/app
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=myapp
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres123
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+    networks:
+      - app-network
+
+  celery-worker:
+    build: 
+      context: ./ml_services
+    container_name: ml-celery-worker
+    command: celery -A tasks worker --loglevel=info
+    volumes:
+      - ./ml_services:/app
+    depends_on:
+      - redis
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=myapp
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres123
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - app-network
+
+  celery-beat:
+    build: 
+      context: ./ml_services
+    container_name: ml-celery-beat
+    command: celery -A tasks beat --loglevel=info
+    volumes:
+      - ./ml_services:/app
+    depends_on:
+      - redis
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=myapp
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres123
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: fatfree-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=myapp
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: shared-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+volumes:
+  postgres-data:
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,11 @@
+{
+  "model_version": "1.0.0",
+  "model_type": "pattern_based_clustering",
+  "trained_date": "2025-10-12",
+  "n_clusters": 4,
+  "n_features": 10,
+  "total_users_trained": 53,
+  "target_platform": "Android/Kotlin",
+  "requires_tensorflow": false,
+  "model_size_kb": 41.337890625
+}
