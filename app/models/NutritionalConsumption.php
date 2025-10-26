@@ -83,7 +83,7 @@ class NutritionalConsumption {
     }
     public function getFoodFeatures($userId) {
         return $this->db->exec(
-            "SELECT * FROM f_user_nutrition_summary(?)",
+            "SELECT * FROM get_user_nutrition_summary(?)",
             [$userId]
         );
     }

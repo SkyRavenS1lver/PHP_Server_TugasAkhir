@@ -35,56 +35,6 @@ class AuthController extends BaseController {
         $activity = $data['activity'] ?? 2;  // 1-4
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT, []);
 
-        // // Calculate features For Clustering
-        // $bmi_category = 2;
-        // // BMI category
-        // if ($bmi < 18.5) $bmi_category = 0;
-        // elseif ($bmi < 25) $bmi_category = 1;
-        // elseif ($bmi < 30) $bmi_category = 2;
-        // else $bmi_category = 3;
-        // // Age group
-        // $bmi_category = 2;
-        // if ($age < 20) $age_group = 0;
-        // elseif ($age < 25) $age_group = 1;
-        // elseif ($age < 30) $age_group = 2;
-        // else $age_group = 3;
-        // Default Indonesian patterns
-        // $features = [
-        //     $bmi_category,
-        //     $age_group,
-        //     $activity,
-        //     $gender,
-        //     0.55,  // carb_pct
-        //     0.15,  // protein_pct
-        //     0.30,  // fat_pct
-        //     0.85,  // macro_balance_score
-        //     1,     // rice_dependency_level
-        //     0.35   // food_diversity_ratio
-        // ];
-        // Load model file
-        // $centroids = json_decode(file_get_contents(__DIR__ .'/android_model/cluster_centroids.json'), true)['centroids'];
-        // $scaler = json_decode(file_get_contents(__DIR__ .'/android_model/scaler_params.json'), true);
-        // // Standardize features
-        // $standardized = [];
-        // for ($i = 0; $i < count($features); $i++) {
-        //     $standardized[] = ($features[$i] - $scaler['mean'][$i]) / $scaler['scale'][$i];
-        // }
-        // // Find nearest cluster (Euclidean distance)
-        // $min_distance = PHP_FLOAT_MAX;
-        // $cluster_id = 0;
-        // foreach ($centroids as $idx => $centroid) {
-        //     $distance = 0;
-        //     for ($i = 0; $i < count($standardized); $i++) {
-        //         $distance += pow($standardized[$i] - $centroid[$i], 2);
-        //     }
-        //     $distance = sqrt($distance);
-            
-        //     if ($distance < $min_distance) {
-        //         $min_distance = $distance;
-        //         $cluster_id = $idx;
-        //     }
-        // }
-
         // Create new user
         $userId = $user->create([
             'name' => $data['name'],
@@ -96,20 +46,9 @@ class AuthController extends BaseController {
             'weight' => $weight,
             'activity' => $activity
         ]);
-        // $userId = 1; // For testing purpose only
         
         // Generate token
         $token = $this->generateToken($userId, $data['email'], $hashedPassword);
-        // Load cluster data
-        // $cluster_foods = json_decode(file_get_contents(__DIR__ ."/android_model/cluster_embeddings/cluster_{$cluster_id}_foods.json"), true);
-        // $foods = [];
-        // foreach ($cluster_foods['foods'] as $food) {
-        //     $foods[] = [
-        //         'user_id' => $userId,
-        //         'food_id' => $food['food_id'],
-        //         'recommendation_score' => $food['recommendation_score'],
-        //     ];
-        // }
         $features = [
             'age' => $age,
             'bmi' => $bmi,
@@ -119,10 +58,11 @@ class AuthController extends BaseController {
             "protein_pct" => 0.20,
             "fat_pct" => 0.30
         ];
-        $flask_url = "http://flask:5000/predict-cluster";
+        $flask_url = "http://flask:5000/get-recommendation";
         $payload = [
             'user_id' => $userId,
-            'features' =>$features
+            'features' =>$features,
+            'recent_records' => []
         ];
         $ch = curl_init($flask_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -140,7 +80,7 @@ class AuthController extends BaseController {
             $this->success('User registered successfully', [
                 'token' => $token,
                 'user_id' => $userId,
-                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d h:i:s'),
                 'food_recommendation' => $response['foods']
             ], 201);
         }
@@ -165,7 +105,7 @@ class AuthController extends BaseController {
         // Find user by email
         $user = new User();
         $userData = $user->findByEmail($data['email']);
-        
+        $userId = $userData['id'];
         if (!$userData || !password_verify($data['password'], $userData['password'])) {
             $this->error('Invalid credentials', 401);
         }
@@ -173,7 +113,56 @@ class AuthController extends BaseController {
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT, []);
         // Generate token
         $token = $this->generateToken($userData['id'], $data['email'], $hashedPassword);
-        
+        $model = new NutritionalConsumption();
+          
+        $food_features = $model->getFoodFeatures($userId);
+        if(count($food_features) <30) {
+            $gender = $userData['gender']-1;      // 0=male, 1=female
+            $age = $userData['age'];
+            $height = $userData['height'];      // cm
+            $weight = $userData['weight'];      // kg
+            $bmi = $weight / pow($height / 100, 2);
+            $activity = $userData['activity'] ?? 2;  // 1-4
+            $food_features = [[
+                'age' => $age,
+                'bmi' => $bmi,
+                'activity' => $activity,
+                'gender' => $gender,
+                "carb_pct" => 0.50,
+                "protein_pct" => 0.20,
+                "fat_pct" => 0.30
+            ]];
+        }
+        $data_record = $model->findByUserId($userId);
+        $flask_url = "http://flask:5000/get-recommendation";
+        $payload = [
+            "user_id"=> $userId,
+            "features"=>$food_features[0],
+            "recent_records"=> $data_record
+        ];
+        $ch = curl_init($flask_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        $response = curl_exec($ch);
+        $response = json_decode($response, true);
+        if (curl_errno($ch)) {
+            $error_msg = curl_error($ch);
+            $this->error($error_msg, 500);
+        } else {
+            $this->success('Login successful', [
+                'token' => $token,
+                'user_id' => $userId,
+                'updated_at' => date('Y-m-d h:i:s'),
+                'food_recommendation' => $response['foods']
+            ], 200);
+        }
+
+        curl_close($ch);
+
         $this->success('Login successful', [
             'user_id' => $userData['id'],
             'token' => $token

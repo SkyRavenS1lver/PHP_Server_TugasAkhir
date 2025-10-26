@@ -61,6 +61,17 @@ class CeleryClient {
         }
         return null;
     }
+     public function getAndDeleteRecommendation($userId) {
+        $resultKey = "recommendation:$userId";
+        
+        // Get and delete in one operation
+        $result = $this->redis->getdel($resultKey);
+        
+        if ($result) {
+            return json_decode($result, true);
+        }
+        return null;
+    }
     
     private function uuid4() {
         return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
