@@ -3,18 +3,9 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 from redis_manager import RedisManager
-import json
 import numpy as np
+import pandas as pd
 import logging
-from flask_executor import Executor
-import os
-from dotenv import load_dotenv
-from redis_manager import RedisManager
-import pickle
-import json
-import numpy as np
-import os
-from pathlib import Path
 from wma_recommendation import WMARecommender, load_baseline_model, load_food_database
 
 # Load model at startup
@@ -27,13 +18,6 @@ kmeans = model_package['model']
 feature_cols = model_package['feature_cols']
 user_profiles = model_package['user_profiles']
 
-X_scaled_train = scaler.transform(
-    user_profiles[feature_cols]
-)
-train_labels = user_profiles['cluster'].values
-
-
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -45,6 +29,16 @@ CORS(app)
 # Initialize Redis
 redis_mgr = RedisManager()
 r = redis_mgr.client
+
+def predict_user_cluster(user_data, scaler, kmeans):
+
+    # Scale features using training scaler
+    features_scaled = scaler.transform(user_data)
+
+    # K-Means can predict directly (finds nearest cluster center)
+    cluster = kmeans.predict(features_scaled)[0]
+
+    return int(cluster)
 
 
 @app.route('/health', methods=['GET'])
@@ -63,26 +57,26 @@ def health_check():
             'error': str(e)
         }), 503
         
-def build_features_array(features):
-    """
-    Build features array in the correct order matching the model's feature_cols.
-    Order must match kmeans_model.py: ['age', 'bmi', 'activity', 'gender', 'carb_pct', 'protein_pct', 'fat_pct']
-
-    Args:
-        features: dict with user feature values
-
-    Returns:
-        np.array: 2D array with shape (1, 7) containing features in correct order
-    """
+def build_demographic_features_array(features):
     return np.array([[
-        features['age'],
-        features['bmi'],
         features['activity'],
-        features['gender'],
-        features['carb_pct'],
-        features['protein_pct'],
-        features['fat_pct']
+        features['bmi']
     ]])
+
+def build_nutrition_features_dict(features):
+    try:
+        if 'carb_pct' in features and 'protein_pct' in features and 'fat_pct' in features:
+            return pd.DataFrame([{
+                'carb_pct': features['carb_pct'],
+                'protein_pct': features['protein_pct'],
+                'fat_pct': features['fat_pct']
+            }])
+        else:
+            logger.warning("Macro features not available, WMA will skip nutrition scoring")
+            return pd.DataFrame([{}])  # Empty DataFrame for WMA to handle gracefully
+    except Exception as e:
+        logger.error(f"Error building nutrition features: {str(e)}")
+        return pd.DataFrame([{}])
 
 @app.route('/get-recommendation', methods=['POST'])
 def predict_cluster():
@@ -93,7 +87,7 @@ def predict_cluster():
         features = data['features']
         recent_foods = data['recent_records']
 
-        if len(recent_foods) == 30:
+        if len(recent_foods) >= 30:
             return retrain_model(features, recent_foods, user_id)
         else:
             return assign_cluster(features, user_id)
@@ -104,15 +98,10 @@ def predict_cluster():
         return jsonify({'error': str(e)}), 400
 
 def assign_cluster(features, user_id):
-    features_array = build_features_array(features)
-    # Scale features
-    features_scaled = scaler.transform(features_array)
-    
-    # Find nearest neighbor
-    distances = np.linalg.norm(X_scaled_train - features_scaled, axis=1)
-    nearest_idx = np.argmin(distances)
-    cluster = int(train_labels[nearest_idx])
-    
+    demographic_features = build_demographic_features_array(features)
+    # Predict cluster using K-Means model
+    cluster = predict_user_cluster(demographic_features, scaler, kmeans)
+    logger.info(f"Cold-start user assigned to cluster {cluster} (activity={features['activity']}, bmi={features['bmi']:.1f})")
     # Get recommendations
     cluster_foods = recommendations[f'cluster_{cluster}']
     send_data = []
@@ -122,30 +111,30 @@ def assign_cluster(features, user_id):
             'food_id': food['food_id'],
             'recommendation_score': food['recommendation_score']
         })
-
     return jsonify({
         'foods': send_data,
     }), 200
 
 def retrain_model(features, recent_foods, user_id):
-    features_array = build_features_array(features)
-    
-    logger.info(f"Features Array: {features_array}")
-    
-    
-    # Process recommendations
-    cluster_id = wma_recommender.get_user_cluster(features_array)
-    user_foods = recent_foods
+    # Build demographic features for cluster assignment
+    demographic_features = build_demographic_features_array(features)
 
+    # Build nutrition features for WMA nutrition scoring
+    nutrition_features = build_nutrition_features_dict(features)
+
+    # Get user's demographic cluster (uses activity + bmi)
+    cluster_id = wma_recommender.get_user_cluster(demographic_features)
+    logger.info(f"User assigned to cluster {cluster_id}")
+
+    # Get WMA recommendations (uses nutrition features for scoring)
     recommendations = wma_recommender.get_recommendations(
-        user_features=features_array,
-        user_foods=user_foods,
+        user_features=nutrition_features,  # Nutrition features for macro-based scoring
+        user_foods=recent_foods,
         cluster_id=cluster_id,
         top_n=30
     )
 
-
-    logger.info(f"✓ Generated {len(recommendations)} recommendations")
+    logger.info(f"✓ Generated {len(recommendations)} WMA recommendations")
     send_data = []
     for food in recommendations:
         send_data.append({
@@ -157,11 +146,6 @@ def retrain_model(features, recent_foods, user_id):
     return jsonify({
         'foods': send_data,
     }), 200
-
-    # return jsonify({
-    #     'user_id': user_id,
-    #     'recommendations': recommendations
-    # }), 200
     
 
 

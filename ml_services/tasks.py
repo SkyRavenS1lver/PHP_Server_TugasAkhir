@@ -37,12 +37,6 @@ RETRAIN_THRESHOLD = 30
 
 @celery_app.task(name='tasks.process_ml_recommendation')
 def process_ml_recommendation(job_data):
-    """
-    Process ML recommendation task by calling Flask API
-
-    Args:
-        job_data: Dictionary containing user_id, features, and recent_records
-    """
     logger.info("=" * 60)
     logger.info(f"Processing ML task for user_id: {job_data.get('user_id')}")
 
@@ -74,15 +68,6 @@ def process_ml_recommendation(job_data):
         result_data = response.json()
 
         logger.info(f"✓ Received response from Flask API")
-
-        # Extract recommendations from response
-        # Handle both response formats: 'foods' (from assign_cluster) and 'recommendations' (from retrain_model)
-        # if 'foods' in result_data:
-        #     recommendations = result_data['foods']
-        # elif 'recommendations' in result_data:
-        #     recommendations = result_data['recommendations']
-        # else:
-        #     raise ValueError("Unexpected response format from Flask API")
 
         logger.info(f"✓ Got {len(result_data['foods'])} recommendations")
 

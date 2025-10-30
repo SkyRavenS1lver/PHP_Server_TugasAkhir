@@ -50,13 +50,8 @@ class AuthController extends BaseController {
         // Generate token
         $token = $this->generateToken($userId, $data['email'], $hashedPassword);
         $features = [
-            'age' => $age,
             'bmi' => $bmi,
-            'activity' => $activity,
-            'gender' => $gender,
-            "carb_pct" => 0.50,
-            "protein_pct" => 0.20,
-            "fat_pct" => 0.30
+            'activity' => $activity
         ];
         $flask_url = "http://flask:5000/get-recommendation";
         $payload = [
