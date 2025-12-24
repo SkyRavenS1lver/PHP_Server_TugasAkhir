@@ -3,8 +3,6 @@
 require_once __DIR__ . '/BaseController.php';
 require_once __DIR__ . '/../models/NutritionalConsumption.php';
 require_once __DIR__ . '/../models/User.php';
-require_once __DIR__ . '/../redis/redis.php';
-// require __DIR__ . '/../../vendor/autoload.php';
 class SyncController extends BaseController {
 
     /**
@@ -177,8 +175,7 @@ class SyncController extends BaseController {
             'server_changes' => [],
             'accepted' => [],
             'rejected' => [],
-            'conflicts' => [],
-            'food_recommendation' => []
+            'conflicts' => []
         ];
         // Get server changes since last_sync
         if (!isset($data['last_sync'])) {
@@ -246,28 +243,6 @@ class SyncController extends BaseController {
                     ];
                 }
             }
-        }
-        $celery = new CeleryClient();
-        // Update WMA counter
-        $userCounter = $user->getCounter($userId)[0]["wma_counter"];
-        if ($userCounter !== null) {
-            $result_counter = $userCounter + $counter;
-            if ($result_counter >= 30) {
-                $data_record = $model->findByUserId($userId);
-                $food_features = $model->getFoodFeatures($userId);
-                $data = [
-                    "user_id"=> $userId,
-                    "features"=>$food_features[0],
-                    "recent_records"=> $data_record
-                ];
-                $celery->sendTask('tasks.process_ml_recommendation', [$data], new \stdClass());
-                $result_counter = 0;
-            }
-            $user->updateCounter($userId, $result_counter);
-        }
-        $recommendation = $celery->getAndDeleteRecommendation($userId);
-        if ($recommendation) {
-            $result['food_recommendation'] = $recommendation['foods'];
         }
         $result['sync_timestamp'] = date('Y-m-d H:i:s');
         $this->success('Consumption records synced', $result);

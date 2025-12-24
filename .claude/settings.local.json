@@ -3,7 +3,9 @@
     "allow": [
       "Read(//c/Users/Raven/Downloads/**)",
       "Bash(python:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(php -S:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

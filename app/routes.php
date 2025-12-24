@@ -29,13 +29,6 @@ $f3->route('GET|POST|PUT|DELETE|PATCH|OPTIONS *', function($f3) {
 $f3->route('GET /', 'HealthController->index');
 $f3->route('GET /health', 'HealthController->index');
 
-// Call Flask API from Fat-Free Framework
-$f3->route('GET /flask-test', function($f3) {
-    $flask_url = 'http://flask:5000/health';
-    $response = file_get_contents($flask_url);
-    echo $response;
-});
-
 // Authentication
 $f3->route('POST /api/auth/register', 'AuthController->register');
 $f3->route('POST /api/auth/login', 'AuthController->login');

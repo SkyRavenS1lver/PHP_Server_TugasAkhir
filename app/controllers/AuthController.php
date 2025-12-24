@@ -49,38 +49,12 @@ class AuthController extends BaseController {
         
         // Generate token
         $token = $this->generateToken($userId, $data['email'], $hashedPassword);
-        $features = [
-            'bmi' => $bmi,
-            'activity' => $activity
-        ];
-        $flask_url = "http://flask:5000/get-recommendation";
-        $payload = [
-            'user_id' => $userId,
-            'features' =>$features,
-            'recent_records' => []
-        ];
-        $ch = curl_init($flask_url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json'
-        ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        $response = curl_exec($ch);
-        $response = json_decode($response, true);
-        if (curl_errno($ch)) {
-            $error_msg = curl_error($ch);
-            $this->error($error_msg, 500);
-        } else {
-            $this->success('User registered successfully', [
-                'token' => $token,
-                'user_id' => $userId,
-                'updated_at' => date('Y-m-d h:i:s'),
-                'food_recommendation' => $response['foods']
-            ], 201);
-        }
 
-        curl_close($ch);
+        $this->success('User registered successfully', [
+            'token' => $token,
+            'user_id' => $userId,
+            'updated_at' => date('Y-m-d h:i:s')
+        ], 201);
         
     }
     
@@ -108,60 +82,12 @@ class AuthController extends BaseController {
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT, []);
         // Generate token
         $token = $this->generateToken($userData['id'], $data['email'], $hashedPassword);
-        $model = new NutritionalConsumption();
-          
-        $food_features = $model->getFoodFeatures($userId);
-        if(count($food_features) <30) {
-            $gender = $userData['gender']-1;      // 0=male, 1=female
-            $age = $userData['age'];
-            $height = $userData['height'];      // cm
-            $weight = $userData['weight'];      // kg
-            $bmi = $weight / pow($height / 100, 2);
-            $activity = $userData['activity'] ?? 2;  // 1-4
-            $food_features = [[
-                'age' => $age,
-                'bmi' => $bmi,
-                'activity' => $activity,
-                'gender' => $gender,
-                "carb_pct" => 0.50,
-                "protein_pct" => 0.20,
-                "fat_pct" => 0.30
-            ]];
-        }
-        $data_record = $model->findByUserId($userId);
-        $flask_url = "http://flask:5000/get-recommendation";
-        $payload = [
-            "user_id"=> $userId,
-            "features"=>$food_features[0],
-            "recent_records"=> $data_record
-        ];
-        $ch = curl_init($flask_url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json'
-        ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        $response = curl_exec($ch);
-        $response = json_decode($response, true);
-        if (curl_errno($ch)) {
-            $error_msg = curl_error($ch);
-            $this->error($error_msg, 500);
-        } else {
-            $this->success('Login successful', [
-                'token' => $token,
-                'user_id' => $userId,
-                'updated_at' => date('Y-m-d h:i:s'),
-                'food_recommendation' => $response['foods']
-            ], 200);
-        }
-
-        curl_close($ch);
 
         $this->success('Login successful', [
-            'user_id' => $userData['id'],
-            'token' => $token
-        ]);
+            'token' => $token,
+            'user_id' => $userId,
+            'updated_at' => date('Y-m-d h:i:s')
+        ], 200);
     }
     
     /**

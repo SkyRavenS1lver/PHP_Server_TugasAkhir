@@ -32,29 +32,12 @@ CREATE TABLE `data_makanan` (
   `kode` varchar(10) DEFAULT NULL,
   `nama_bahan` varchar(255) DEFAULT NULL,
   `sumber` varchar(25) DEFAULT NULL,
-  `air` varchar(10) NOT NULL DEFAULT '0',
   `energi` varchar(10) NOT NULL DEFAULT '0',
   `protein` varchar(10) NOT NULL DEFAULT '0',
   `lemak` varchar(10) NOT NULL DEFAULT '0',
   `karbohidrat` varchar(10) NOT NULL DEFAULT '0',
   `serat` varchar(10) NOT NULL DEFAULT '0',
-  `abu` varchar(10) NOT NULL DEFAULT '0',
-  `kalsium` varchar(10) NOT NULL DEFAULT '0',
-  `fosfor` varchar(10) NOT NULL DEFAULT '0',
-  `besi` varchar(10) NOT NULL DEFAULT '0',
-  `natrium` varchar(10) NOT NULL DEFAULT '0',
-  `kalium` varchar(10) NOT NULL DEFAULT '0',
-  `tembaga` varchar(10) NOT NULL DEFAULT '0',
-  `seng` varchar(10) NOT NULL DEFAULT '0',
-  `retinol` varchar(10) NOT NULL DEFAULT '0',
-  `beta_karoten` varchar(10) NOT NULL DEFAULT '0',
-  `karoten_total` varchar(10) NOT NULL DEFAULT '0',
-  `thiamin` varchar(10) NOT NULL DEFAULT '0',
-  `rifobla` varchar(10) NOT NULL DEFAULT '0',
-  `niasin` varchar(10) NOT NULL DEFAULT '0',
-  `vit_c` varchar(10) NOT NULL DEFAULT '0',
-  `bdd` varchar(10) DEFAULT NULL,
-  `gambar` varchar(255) DEFAULT NULL
+  `bdd` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

@@ -20,7 +20,7 @@ CREATE TABLE `data_makanan_urt` (
   CONSTRAINT `fk_urt_list` FOREIGN KEY (`urt_list_id`) REFERENCES `urt_list` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
+-
 -- Dumping data for table `data_makanan_urt`
 --
 
