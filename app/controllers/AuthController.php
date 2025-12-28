@@ -31,7 +31,6 @@ class AuthController extends BaseController {
         $age = $data['age'];
         $height = $data['height'];      // cm
         $weight = $data['weight'];      // kg
-        $bmi = $weight / pow($height / 100, 2);
         $activity = $data['activity'] ?? 2;  // 1-4
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT, []);
 

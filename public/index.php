@@ -30,9 +30,9 @@ if ($f3->get('DEBUG') >= 3) {
 // Set up database connection
 $db = new \DB\SQL(
     sprintf(
-        'pgsql:host=%s;port=%s;dbname=%s',
+        'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
         $_ENV['DB_HOST'] ?: 'localhost',
-        $_ENV['DB_PORT'] ?: '5432',
+        $_ENV['DB_PORT'] ?: '3306',
         $_ENV['DB_NAME'] ?: 'myapp'
     ),
     $_ENV['DB_USER'],

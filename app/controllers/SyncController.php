@@ -65,7 +65,6 @@ class SyncController extends BaseController {
      */
     public function syncProfile() {
         $userId = $this->f3->get('user_id');
-        // $userId = 74;
         $data = $this->getRequestBody();
 
         $userModel = new User();
@@ -166,11 +165,9 @@ class SyncController extends BaseController {
      */
     public function syncConsumptions() {
         $userId = $this->f3->get('user_id');
-        // $userId = 74;
         $data = $this->getRequestBody();
 
         $model = new NutritionalConsumption();
-        $user = new User();
         $result = [
             'server_changes' => [],
             'accepted' => [],
