@@ -12,26 +12,46 @@ class AuthController extends BaseController {
     public function register() {
         $data = $this->getRequestBody();        
         // Validate required fields
-        $missing = $this->validateRequired($data, ['name', 'email', 'password', 'age', 'gender', 'height', 'weight', 'activity']);
+        $missing = $this->validateRequired($data, ['name', 'email', 'password', 'age', 'gender', 'height', 'weight', 'activity_description']);
         if (!empty($missing)) {
             $this->error('Missing required fields', 400, $missing);
         }
-        
+
         // Validate email format
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
             $this->error('Invalid email format', 400);
         }
-        
+
         // Check if user already exists
         $user = new User();
         if ($user->findByEmail($data['email'])) {
             $this->error('Email already registered', 409);
         }
+
+        // Get activity level from Flask API
+        $ch = curl_init('http://localhost:5000/api/analyze-activity');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['activity_description' => $data['activity_description']]));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode !== 200) {
+            $this->error('Failed to analyze activity', 500);
+        }
+
+        $activityResponse = json_decode($response, true);
+        if (!$activityResponse['success']) {
+            $this->error('Failed to analyze activity', 500);
+        }
+
         $gender = $data['gender']-1;      // 0=male, 1=female
         $age = $data['age'];
         $height = $data['height'];      // cm
         $weight = $data['weight'];      // kg
-        $activity = $data['activity'] ?? 2;  // 1-4
+        $activity = $activityResponse['data']['activity_level'];
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT, []);
 
         // Create new user
@@ -52,6 +72,7 @@ class AuthController extends BaseController {
         $this->success('User registered successfully', [
             'token' => $token,
             'user_id' => $userId,
+            'activity_level' => $activity,
             'updated_at' => date('Y-m-d h:i:s')
         ], 201);
         
@@ -73,14 +94,14 @@ class AuthController extends BaseController {
         // Find user by email
         $user = new User();
         $userData = $user->findByEmail($data['email']);
-        $userId = $userData['id'];
+        $userId = $userData['id_user'];
         if (!$userData || !password_verify($data['password'], $userData['password'])) {
             $this->error('Invalid credentials', 401);
         }
 
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT, []);
         // Generate token
-        $token = $this->generateToken($userData['id'], $data['email'], $hashedPassword);
+        $token = $this->generateToken($userData['id_user'], $data['email'], $hashedPassword);
 
         $this->success('Login successful', [
             'token' => $token,

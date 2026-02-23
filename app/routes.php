@@ -79,13 +79,40 @@ $f3->route('POST /api/sync/consumptions', function($f3) {
 /**
  * Sync Status Check
  * GET /api/sync/status
- * 
+ *
  * Returns server timestamp and sync status
  */
 $f3->route('GET /api/sync/status', function($f3) {
     AuthMiddleware::verify();
     $controller = new SyncController();
     $controller->status();
+});
+
+/**
+ * Activity Analysis
+ * POST /api/analyze-activity
+ *
+ * Analyzes activity description and returns activity level
+ */
+$f3->route('POST /api/analyze-activity', function($f3) {
+    // AuthMiddleware::verify();
+
+    $body = json_decode($f3->get('BODY'), true);
+    $activity_description = $body['activity_description'] ?? '';
+
+    $ch = curl_init('http://localhost:5000/api/analyze-activity');
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['activity_description' => $activity_description]));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    header('Content-Type: application/json');
+    http_response_code($httpCode);
+    echo $response;
 });
 
 // ============================================
